@@ -1,8 +1,8 @@
-import { useRef, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Video } from '@/types/video';
+import VideoSettings from '@/components/VideoSettings';
 
 interface VideoPlayerProps {
   isPlaying: boolean;
@@ -14,6 +14,9 @@ interface VideoPlayerProps {
   isMuted: boolean;
   showControls: boolean;
   seekIndicator: { show: boolean; direction: 'forward' | 'backward' };
+  quality: string;
+  playbackSpeed: number;
+  showVideoSettings: boolean;
   onClose: () => void;
   onTogglePlayPause: () => void;
   onToggleMute: () => void;
@@ -21,6 +24,9 @@ interface VideoPlayerProps {
   onProgressChange: (value: number[]) => void;
   onMouseMove: () => void;
   formatTime: (seconds: number) => string;
+  onToggleVideoSettings: () => void;
+  onQualityChange: (quality: string) => void;
+  onSpeedChange: (speed: number) => void;
 }
 
 export default function VideoPlayer({
@@ -33,6 +39,9 @@ export default function VideoPlayer({
   isMuted,
   showControls,
   seekIndicator,
+  quality,
+  playbackSpeed,
+  showVideoSettings,
   onClose,
   onTogglePlayPause,
   onToggleMute,
@@ -40,6 +49,9 @@ export default function VideoPlayer({
   onProgressChange,
   onMouseMove,
   formatTime,
+  onToggleVideoSettings,
+  onQualityChange,
+  onSpeedChange,
 }: VideoPlayerProps) {
   return (
     <Dialog open={isPlaying} onOpenChange={onClose}>
@@ -122,10 +134,14 @@ export default function VideoPlayer({
                   </div>
 
                   <div className="flex items-center gap-2">
+                    <div className="text-white text-sm mr-2">
+                      {quality} • {playbackSpeed}x
+                    </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="text-white hover:bg-white/20"
+                      onClick={onToggleVideoSettings}
                     >
                       <Icon name="Settings" size={20} />
                     </Button>
@@ -154,6 +170,15 @@ export default function VideoPlayer({
           </div>
         </div>
       </DialogContent>
+
+      <VideoSettings
+        isOpen={showVideoSettings}
+        onClose={onToggleVideoSettings}
+        quality={quality}
+        playbackSpeed={playbackSpeed}
+        onQualityChange={onQualityChange}
+        onSpeedChange={onSpeedChange}
+      />
     </Dialog>
   );
 }

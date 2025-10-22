@@ -11,6 +11,9 @@ export function useVideoPlayer() {
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [seekIndicator, setSeekIndicator] = useState<{show: boolean, direction: 'forward' | 'backward'}>({show: false, direction: 'forward'});
+  const [quality, setQuality] = useState('1080p');
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [showVideoSettings, setShowVideoSettings] = useState(false);
   const controlsTimeoutRef = useRef<number | null>(null);
   const seekIndicatorTimeoutRef = useRef<number | null>(null);
 
@@ -78,12 +81,12 @@ export function useVideoPlayer() {
             setVideoPlaying(false);
             return duration;
           }
-          return prev + 1;
+          return prev + playbackSpeed;
         });
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isPlaying, videoPlaying, duration]);
+  }, [isPlaying, videoPlaying, duration, playbackSpeed]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -130,6 +133,18 @@ export function useVideoPlayer() {
     setIsPlaying(true);
   };
 
+  const toggleVideoSettings = () => {
+    setShowVideoSettings(!showVideoSettings);
+  };
+
+  const handleQualityChange = (newQuality: string) => {
+    setQuality(newQuality);
+  };
+
+  const handleSpeedChange = (newSpeed: number) => {
+    setPlaybackSpeed(newSpeed);
+  };
+
   return {
     selectedVideo,
     isPlaying,
@@ -140,6 +155,9 @@ export function useVideoPlayer() {
     isMuted,
     showControls,
     seekIndicator,
+    quality,
+    playbackSpeed,
+    showVideoSettings,
     closeVideoPlayer,
     togglePlayPause,
     toggleMute,
@@ -148,5 +166,8 @@ export function useVideoPlayer() {
     formatTime,
     handleMouseMove,
     handleVideoClick,
+    toggleVideoSettings,
+    handleQualityChange,
+    handleSpeedChange,
   };
 }

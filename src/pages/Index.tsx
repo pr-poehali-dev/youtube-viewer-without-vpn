@@ -96,6 +96,9 @@ export default function Index() {
         isMuted={videoPlayer.isMuted}
         showControls={videoPlayer.showControls}
         seekIndicator={videoPlayer.seekIndicator}
+        quality={videoPlayer.quality}
+        playbackSpeed={videoPlayer.playbackSpeed}
+        showVideoSettings={videoPlayer.showVideoSettings}
         onClose={videoPlayer.closeVideoPlayer}
         onTogglePlayPause={videoPlayer.togglePlayPause}
         onToggleMute={videoPlayer.toggleMute}
@@ -103,6 +106,9 @@ export default function Index() {
         onProgressChange={videoPlayer.handleProgressChange}
         onMouseMove={videoPlayer.handleMouseMove}
         formatTime={videoPlayer.formatTime}
+        onToggleVideoSettings={videoPlayer.toggleVideoSettings}
+        onQualityChange={videoPlayer.handleQualityChange}
+        onSpeedChange={videoPlayer.handleSpeedChange}
       />
     </div>
   );
