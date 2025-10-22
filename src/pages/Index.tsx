@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import SettingsDialog from '@/components/SettingsDialog';
 
@@ -20,6 +21,8 @@ export default function Index() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [history, setHistory] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const trendingVideos: Video[] = [
     {
@@ -80,16 +83,23 @@ export default function Index() {
     }
   };
 
-  const handleVideoClick = (videoId: string) => {
-    if (!history.includes(videoId)) {
-      setHistory([videoId, ...history]);
+  const handleVideoClick = (video: Video) => {
+    if (!history.includes(video.id)) {
+      setHistory([video.id, ...history]);
     }
+    setSelectedVideo(video);
+    setIsPlaying(true);
+  };
+
+  const closeVideoPlayer = () => {
+    setSelectedVideo(null);
+    setIsPlaying(false);
   };
 
   const VideoCard = ({ video }: { video: Video }) => (
     <Card 
       className="group bg-card border-border overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:border-primary"
-      onClick={() => handleVideoClick(video.id)}
+      onClick={() => handleVideoClick(video)}
     >
       <div className="relative aspect-video bg-muted">
         <img 
@@ -286,6 +296,42 @@ export default function Index() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={isPlaying} onOpenChange={closeVideoPlayer}>
+        <DialogContent className="max-w-6xl w-full p-0 bg-black border-none">
+          <div className="relative w-full">
+            <div className="aspect-video bg-black flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Play" size={48} className="text-white ml-2" />
+                </div>
+                <p className="text-white text-lg mb-2">{selectedVideo?.title}</p>
+                <p className="text-gray-400 text-sm">{selectedVideo?.channel}</p>
+              </div>
+            </div>
+            
+            <div className="absolute top-4 right-4">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={closeVideoPlayer}
+                className="bg-black/50 hover:bg-black/70 text-white"
+              >
+                <Icon name="X" size={24} />
+              </Button>
+            </div>
+
+            <div className="bg-background p-4 border-t border-border">
+              <h3 className="font-semibold text-lg mb-2">{selectedVideo?.title}</h3>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span>{selectedVideo?.channel}</span>
+                <span>{selectedVideo?.views}</span>
+                <span>{selectedVideo?.duration}</span>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
