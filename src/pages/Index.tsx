@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import SettingsDialog from '@/components/SettingsDialog';
 
 interface Video {
   id: string;
@@ -162,6 +163,7 @@ export default function Index() {
             <Button variant="ghost" size="icon">
               <Icon name="Bell" size={22} />
             </Button>
+            <SettingsDialog />
           </div>
         </div>
       </header>
