@@ -141,9 +141,11 @@ export default function Index() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Icon name="Play" size={24} className="text-white" />
-              </div>
+              <img 
+                src="https://cdn.poehali.dev/projects/cc53c4ff-a42c-46de-a671-5fbeb5dceb20/files/59a97f59-c679-4c6d-8d7a-1d5fa83414cf.jpg" 
+                alt="Saturn Logo" 
+                className="w-10 h-10 object-contain"
+              />
               <h1 className="text-xl font-bold hidden sm:block">Сатурн</h1>
             </div>
             
