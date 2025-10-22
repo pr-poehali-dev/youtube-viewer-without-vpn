@@ -159,6 +159,44 @@ export default function Index() {
     }
   }, [isPlaying, videoPlaying, duration]);
 
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (!isPlaying) return;
+      
+      switch(e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          setCurrentTime((prev) => Math.max(0, prev - 10));
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          setCurrentTime((prev) => Math.min(duration, prev + 10));
+          break;
+        case ' ':
+          e.preventDefault();
+          togglePlayPause();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setVolume((prev) => Math.min(100, prev + 10));
+          setIsMuted(false);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          setVolume((prev) => Math.max(0, prev - 10));
+          break;
+        case 'm':
+        case 'M':
+          e.preventDefault();
+          toggleMute();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isPlaying, duration, videoPlaying]);
+
   const VideoCard = ({ video }: { video: Video }) => (
     <Card 
       className="group bg-card border-border overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:border-primary"
