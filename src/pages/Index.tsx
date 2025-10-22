@@ -144,7 +144,7 @@ export default function Index() {
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <Icon name="Play" size={24} className="text-white" />
               </div>
-              <h1 className="text-xl font-bold hidden sm:block">Юпитер</h1>
+              <h1 className="text-xl font-bold hidden sm:block">Сатурн</h1>
             </div>
             
             <div className="flex-1 max-w-2xl">
