@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,6 +23,13 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(true);
+  const [volume, setVolume] = useState(100);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(100);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const controlsTimeoutRef = useRef<number | null>(null);
 
   const trendingVideos: Video[] = [
     {
@@ -94,7 +101,63 @@ export default function Index() {
   const closeVideoPlayer = () => {
     setSelectedVideo(null);
     setIsPlaying(false);
+    setVideoPlaying(true);
+    setCurrentTime(0);
   };
+
+  const togglePlayPause = () => {
+    setVideoPlaying(!videoPlaying);
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0]);
+    if (value[0] > 0) setIsMuted(false);
+  };
+
+  const handleProgressChange = (value: number[]) => {
+    setCurrentTime(value[0]);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleMouseMove = () => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      window.clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = window.setTimeout(() => {
+      if (videoPlaying) setShowControls(false);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    if (!videoPlaying) {
+      setShowControls(true);
+    }
+  }, [videoPlaying]);
+
+  useEffect(() => {
+    if (isPlaying && videoPlaying) {
+      const interval = setInterval(() => {
+        setCurrentTime((prev) => {
+          if (prev >= duration) {
+            setVideoPlaying(false);
+            return duration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying, videoPlaying, duration]);
 
   const VideoCard = ({ video }: { video: Video }) => (
     <Card 
@@ -299,14 +362,88 @@ export default function Index() {
 
       <Dialog open={isPlaying} onOpenChange={closeVideoPlayer}>
         <DialogContent className="max-w-6xl w-full p-0 bg-black border-none">
-          <div className="relative w-full">
-            <div className="aspect-video bg-black flex items-center justify-center">
+          <div className="relative w-full" onMouseMove={handleMouseMove}>
+            <div className="aspect-video bg-black flex items-center justify-center relative group">
               <div className="text-center">
-                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Icon name="Play" size={48} className="text-white ml-2" />
-                </div>
                 <p className="text-white text-lg mb-2">{selectedVideo?.title}</p>
                 <p className="text-gray-400 text-sm">{selectedVideo?.channel}</p>
+              </div>
+              
+              <div 
+                className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                onClick={togglePlayPause}
+              >
+                {!videoPlaying && (
+                  <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
+                    <Icon name="Play" size={48} className="text-white ml-2" />
+                  </div>
+                )}
+              </div>
+
+              <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white text-sm">{formatTime(currentTime)}</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max={duration}
+                      value={currentTime}
+                      onChange={(e) => handleProgressChange([parseInt(e.target.value)])}
+                      className="flex-1 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                    />
+                    <span className="text-white text-sm">{formatTime(duration)}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={togglePlayPause}
+                        className="text-white hover:bg-white/20"
+                      >
+                        <Icon name={videoPlaying ? "Pause" : "Play"} size={24} />
+                      </Button>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleMute}
+                          className="text-white hover:bg-white/20"
+                        >
+                          <Icon name={isMuted || volume === 0 ? "VolumeX" : volume < 50 ? "Volume1" : "Volume2"} size={20} />
+                        </Button>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={isMuted ? 0 : volume}
+                          onChange={(e) => handleVolumeChange([parseInt(e.target.value)])}
+                          className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/20"
+                      >
+                        <Icon name="Settings" size={20} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/20"
+                      >
+                        <Icon name="Maximize" size={20} />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
