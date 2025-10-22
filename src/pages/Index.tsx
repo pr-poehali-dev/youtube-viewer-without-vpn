@@ -29,7 +29,9 @@ export default function Index() {
   const [duration, setDuration] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [seekIndicator, setSeekIndicator] = useState<{show: boolean, direction: 'forward' | 'backward'}>({show: false, direction: 'forward'});
   const controlsTimeoutRef = useRef<number | null>(null);
+  const seekIndicatorTimeoutRef = useRef<number | null>(null);
 
   const trendingVideos: Video[] = [
     {
@@ -159,6 +161,16 @@ export default function Index() {
     }
   }, [isPlaying, videoPlaying, duration]);
 
+  const showSeekIndicator = (direction: 'forward' | 'backward') => {
+    setSeekIndicator({show: true, direction});
+    if (seekIndicatorTimeoutRef.current) {
+      window.clearTimeout(seekIndicatorTimeoutRef.current);
+    }
+    seekIndicatorTimeoutRef.current = window.setTimeout(() => {
+      setSeekIndicator({show: false, direction});
+    }, 500);
+  };
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (!isPlaying) return;
@@ -167,10 +179,12 @@ export default function Index() {
         case 'ArrowLeft':
           e.preventDefault();
           setCurrentTime((prev) => Math.max(0, prev - 10));
+          showSeekIndicator('backward');
           break;
         case 'ArrowRight':
           e.preventDefault();
           setCurrentTime((prev) => Math.min(duration, prev + 10));
+          showSeekIndicator('forward');
           break;
         case ' ':
           e.preventDefault();
@@ -417,6 +431,19 @@ export default function Index() {
                   </div>
                 )}
               </div>
+
+              {seekIndicator.show && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-black/70 rounded-full p-6 animate-fade-in-out">
+                    <Icon 
+                      name={seekIndicator.direction === 'forward' ? 'FastForward' : 'Rewind'} 
+                      size={48} 
+                      className="text-white" 
+                    />
+                    <p className="text-white text-sm mt-2 text-center">10 сек</p>
+                  </div>
+                </div>
+              )}
 
               <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
                 <div className="space-y-4">
