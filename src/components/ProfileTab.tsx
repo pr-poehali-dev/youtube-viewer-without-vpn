@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,23 +7,48 @@ import Icon from '@/components/ui/icon';
 interface ProfileTabProps {
   email: string;
   nickname: string;
-  onSave: (email: string, nickname: string) => void;
+  avatar: string | null;
+  onSave: (email: string, nickname: string, avatar: string | null) => void;
 }
 
-export default function ProfileTab({ email, nickname, onSave }: ProfileTabProps) {
+export default function ProfileTab({ email, nickname, avatar, onSave }: ProfileTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editEmail, setEditEmail] = useState(email);
   const [editNickname, setEditNickname] = useState(nickname);
+  const [editAvatar, setEditAvatar] = useState<string | null>(avatar);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = () => {
-    onSave(editEmail, editNickname);
+    onSave(editEmail, editNickname, editAvatar);
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setEditEmail(email);
     setEditNickname(nickname);
+    setEditAvatar(avatar);
     setIsEditing(false);
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setEditAvatar(null);
   };
 
   return (
@@ -35,14 +60,34 @@ export default function ProfileTab({ email, nickname, onSave }: ProfileTabProps)
 
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center">
-            <Icon name="User" size={40} className="text-white" />
+          <div 
+            className="relative w-20 h-20 rounded-full bg-primary flex items-center justify-center overflow-hidden cursor-pointer group"
+            onClick={handleAvatarClick}
+          >
+            {editAvatar ? (
+              <img src={editAvatar} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <Icon name="User" size={40} className="text-white" />
+            )}
+            {isEditing && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Icon name="Camera" size={24} className="text-white" />
+              </div>
+            )}
           </div>
           <div>
             <h3 className="text-xl font-semibold">{nickname}</h3>
             <p className="text-muted-foreground">{email}</p>
           </div>
         </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
 
         {!isEditing ? (
           <Button onClick={() => setIsEditing(true)} className="w-full sm:w-auto">
@@ -51,6 +96,30 @@ export default function ProfileTab({ email, nickname, onSave }: ProfileTabProps)
           </Button>
         ) : (
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Фото профиля</Label>
+              <div className="flex gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleAvatarClick}
+                  className="flex-1"
+                >
+                  <Icon name="Upload" size={18} className="mr-2" />
+                  Загрузить фото
+                </Button>
+                {editAvatar && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleRemoveAvatar}
+                  >
+                    <Icon name="Trash2" size={18} />
+                  </Button>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="nickname">Никнейм</Label>
               <Input

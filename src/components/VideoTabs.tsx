@@ -13,10 +13,11 @@ interface VideoTabsProps {
   trendingVideos: Video[];
   email: string;
   nickname: string;
+  avatar: string | null;
   onTabChange: (value: string) => void;
   onVideoClick: (video: Video) => void;
   onToggleFavorite: (videoId: string) => void;
-  onSaveProfile: (email: string, nickname: string) => void;
+  onSaveProfile: (email: string, nickname: string, avatar: string | null) => void;
 }
 
 export default function VideoTabs({
@@ -27,6 +28,7 @@ export default function VideoTabs({
   trendingVideos,
   email,
   nickname,
+  avatar,
   onTabChange,
   onVideoClick,
   onToggleFavorite,
@@ -179,6 +181,7 @@ export default function VideoTabs({
         <ProfileTab 
           email={email}
           nickname={nickname}
+          avatar={avatar}
           onSave={onSaveProfile}
         />
       </TabsContent>

@@ -16,12 +16,14 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState('home');
   const [email, setEmail] = useState('user@example.com');
   const [nickname, setNickname] = useState('VideoUser');
+  const [avatar, setAvatar] = useState<string | null>(null);
 
   const videoPlayer = useVideoPlayer();
 
-  const handleSaveProfile = (newEmail: string, newNickname: string) => {
+  const handleSaveProfile = (newEmail: string, newNickname: string, newAvatar: string | null) => {
     setEmail(newEmail);
     setNickname(newNickname);
+    setAvatar(newAvatar);
   };
 
   const toggleFavorite = (videoId: string) => {
@@ -94,6 +96,7 @@ export default function Index() {
           trendingVideos={trendingVideos}
           email={email}
           nickname={nickname}
+          avatar={avatar}
           onTabChange={setActiveTab}
           onVideoClick={handleVideoClick}
           onToggleFavorite={toggleFavorite}
