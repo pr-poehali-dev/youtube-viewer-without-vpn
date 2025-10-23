@@ -41,6 +41,10 @@ export default function VideoTabs({
           <Icon name="Home" size={18} />
           <span className="hidden sm:inline">Главная</span>
         </TabsTrigger>
+        <TabsTrigger value="shorts" className="gap-2">
+          <Icon name="Film" size={18} />
+          <span className="hidden sm:inline">Shorts</span>
+        </TabsTrigger>
         <TabsTrigger value="search" className="gap-2">
           <Icon name="Search" size={18} />
           <span className="hidden sm:inline">Поиск</span>
@@ -77,6 +81,33 @@ export default function VideoTabs({
               onVideoClick={onVideoClick}
               onToggleFavorite={onToggleFavorite}
             />
+          ))}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="shorts" className="mt-0">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-4">Shorts</h2>
+          <p className="text-muted-foreground">Короткие вертикальные видео</p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {trendingVideos.map((video) => (
+            <div
+              key={video.id}
+              onClick={() => onVideoClick(video)}
+              className="relative aspect-[9/16] rounded-xl overflow-hidden cursor-pointer group bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600"
+            >
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Icon name="Play" size={48} className="text-white/80 group-hover:scale-110 transition-transform" />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                <p className="text-white text-sm font-medium line-clamp-2">{video.title}</p>
+                <p className="text-white/80 text-xs mt-1">{video.views}</p>
+              </div>
+              <div className="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded text-white text-xs font-semibold">
+                {video.duration}
+              </div>
+            </div>
           ))}
         </div>
       </TabsContent>

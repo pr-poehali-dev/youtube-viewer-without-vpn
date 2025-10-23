@@ -7,6 +7,8 @@ import VideoPlayer from '@/components/VideoPlayer';
 import VideoTabs from '@/components/VideoTabs';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { trendingVideos } from '@/data/trendingVideos';
+import { shortsVideos } from '@/data/shortsVideos';
+import ShortsViewer from '@/components/ShortsViewer';
 import { Video } from '@/types/video';
 
 export default function Index() {
@@ -29,6 +31,7 @@ export default function Index() {
   const [avatar, setAvatar] = useState<string | null>(() => {
     return localStorage.getItem('avatar') || null;
   });
+  const [showShortsViewer, setShowShortsViewer] = useState(false);
 
   const videoPlayer = useVideoPlayer();
 
@@ -74,7 +77,12 @@ export default function Index() {
     if (!history.includes(video.id)) {
       setHistory([video.id, ...history]);
     }
-    videoPlayer.handleVideoClick(video);
+    
+    if (activeTab === 'shorts') {
+      setShowShortsViewer(true);
+    } else {
+      videoPlayer.handleVideoClick(video);
+    }
   };
 
   return (
@@ -164,6 +172,22 @@ export default function Index() {
         onQualityChange={videoPlayer.handleQualityChange}
         onSpeedChange={videoPlayer.handleSpeedChange}
       />
+
+      {showShortsViewer && (
+        <div className="fixed inset-0 z-50">
+          <button
+            onClick={() => setShowShortsViewer(false)}
+            className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+          >
+            <Icon name="X" size={24} />
+          </button>
+          <ShortsViewer
+            shorts={shortsVideos}
+            onToggleFavorite={toggleFavorite}
+            favorites={favorites}
+          />
+        </div>
+      )}
     </div>
   );
 }
