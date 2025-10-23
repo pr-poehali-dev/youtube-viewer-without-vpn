@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -11,14 +11,50 @@ import { Video } from '@/types/video';
 
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [history, setHistory] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    const saved = localStorage.getItem('favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [history, setHistory] = useState<string[]>(() => {
+    const saved = localStorage.getItem('history');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [activeTab, setActiveTab] = useState('home');
-  const [email, setEmail] = useState('user@example.com');
-  const [nickname, setNickname] = useState('VideoUser');
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [email, setEmail] = useState(() => {
+    return localStorage.getItem('email') || 'user@example.com';
+  });
+  const [nickname, setNickname] = useState(() => {
+    return localStorage.getItem('nickname') || 'VideoUser';
+  });
+  const [avatar, setAvatar] = useState<string | null>(() => {
+    return localStorage.getItem('avatar') || null;
+  });
 
   const videoPlayer = useVideoPlayer();
+
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  useEffect(() => {
+    localStorage.setItem('history', JSON.stringify(history));
+  }, [history]);
+
+  useEffect(() => {
+    localStorage.setItem('email', email);
+  }, [email]);
+
+  useEffect(() => {
+    localStorage.setItem('nickname', nickname);
+  }, [nickname]);
+
+  useEffect(() => {
+    if (avatar) {
+      localStorage.setItem('avatar', avatar);
+    } else {
+      localStorage.removeItem('avatar');
+    }
+  }, [avatar]);
 
   const handleSaveProfile = (newEmail: string, newNickname: string, newAvatar: string | null) => {
     setEmail(newEmail);
