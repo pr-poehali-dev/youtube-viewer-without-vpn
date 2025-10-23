@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Video } from '@/types/video';
 import VideoSettings from '@/components/VideoSettings';
+import { useState, useEffect } from 'react';
 
 interface VideoPlayerProps {
   isPlaying: boolean;
@@ -53,11 +54,32 @@ export default function VideoPlayer({
   onQualityChange,
   onSpeedChange,
 }: VideoPlayerProps) {
+  const [isLandscape, setIsLandscape] = useState(false);
+
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      setIsLandscape(window.matchMedia('(orientation: landscape)').matches);
+    };
+
+    handleOrientationChange();
+    window.addEventListener('resize', handleOrientationChange);
+    window.screen.orientation?.addEventListener('change', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.screen.orientation?.removeEventListener('change', handleOrientationChange);
+    };
+  }, []);
+
   return (
     <Dialog open={isPlaying} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl w-full p-0 bg-black border-none">
-        <div className="relative w-full" onMouseMove={onMouseMove}>
-          <div className="aspect-video bg-black flex items-center justify-center relative group">
+      <DialogContent className={`w-full p-0 bg-black border-none transition-all ${
+        isLandscape ? 'max-w-full h-screen' : 'max-w-6xl'
+      }`}>
+        <div className="relative w-full h-full" onMouseMove={onMouseMove}>
+          <div className={`bg-black flex items-center justify-center relative group ${
+            isLandscape ? 'h-screen' : 'aspect-video'
+          }`}>
             <div className="text-center">
               <p className="text-white text-lg mb-2">{selectedVideo?.title}</p>
               <p className="text-gray-400 text-sm">{selectedVideo?.channel}</p>
