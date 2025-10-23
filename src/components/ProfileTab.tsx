@@ -8,10 +8,14 @@ interface ProfileTabProps {
   email: string;
   nickname: string;
   avatar: string | null;
+  subscriptions: string[];
   onSave: (email: string, nickname: string, avatar: string | null) => void;
+  onToggleSubscription: (channelId: string) => void;
 }
 
-export default function ProfileTab({ email, nickname, avatar, onSave }: ProfileTabProps) {
+import { channels } from '@/data/channels';
+
+export default function ProfileTab({ email, nickname, avatar, subscriptions, onSave, onToggleSubscription }: ProfileTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editEmail, setEditEmail] = useState(email);
   const [editNickname, setEditNickname] = useState(nickname);
@@ -173,6 +177,43 @@ export default function ProfileTab({ email, nickname, avatar, onSave }: ProfileT
               <p className="text-2xl font-bold">0</p>
             </div>
           </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-border">
+          <h4 className="font-semibold mb-4">Подписки ({subscriptions.length})</h4>
+          {subscriptions.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Icon name="Users" size={48} className="mx-auto mb-2 opacity-50" />
+              <p>Вы пока ни на кого не подписаны</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {channels
+                .filter(channel => subscriptions.includes(channel.id))
+                .map(channel => (
+                  <div key={channel.id} className="flex items-center gap-4 bg-secondary/30 rounded-lg p-4">
+                    <img 
+                      src={channel.avatar} 
+                      alt={channel.name}
+                      className="w-12 h-12 rounded-full"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h5 className="font-semibold truncate">{channel.name}</h5>
+                      <p className="text-sm text-muted-foreground">{channel.subscribers}</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onToggleSubscription(channel.id)}
+                      className="shrink-0"
+                    >
+                      <Icon name="UserMinus" size={16} className="mr-2" />
+                      Отписаться
+                    </Button>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

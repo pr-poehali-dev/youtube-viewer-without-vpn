@@ -31,6 +31,10 @@ export default function Index() {
   const [avatar, setAvatar] = useState<string | null>(() => {
     return localStorage.getItem('avatar') || null;
   });
+  const [subscriptions, setSubscriptions] = useState<string[]>(() => {
+    const saved = localStorage.getItem('subscriptions');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [showShortsViewer, setShowShortsViewer] = useState(false);
 
   const videoPlayer = useVideoPlayer();
@@ -59,6 +63,10 @@ export default function Index() {
     }
   }, [avatar]);
 
+  useEffect(() => {
+    localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
+  }, [subscriptions]);
+
   const handleSaveProfile = (newEmail: string, newNickname: string, newAvatar: string | null) => {
     setEmail(newEmail);
     setNickname(newNickname);
@@ -70,6 +78,14 @@ export default function Index() {
       setFavorites(favorites.filter(id => id !== videoId));
     } else {
       setFavorites([...favorites, videoId]);
+    }
+  };
+
+  const toggleSubscription = (channelId: string) => {
+    if (subscriptions.includes(channelId)) {
+      setSubscriptions(subscriptions.filter(id => id !== channelId));
+    } else {
+      setSubscriptions([...subscriptions, channelId]);
     }
   };
 
@@ -137,6 +153,7 @@ export default function Index() {
           searchQuery={searchQuery}
           history={history}
           favorites={favorites}
+          subscriptions={subscriptions}
           trendingVideos={trendingVideos}
           email={email}
           nickname={nickname}
@@ -144,6 +161,7 @@ export default function Index() {
           onTabChange={setActiveTab}
           onVideoClick={handleVideoClick}
           onToggleFavorite={toggleFavorite}
+          onToggleSubscription={toggleSubscription}
           onSaveProfile={handleSaveProfile}
         />
       </div>

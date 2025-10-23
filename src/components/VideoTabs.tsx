@@ -4,12 +4,15 @@ import Icon from '@/components/ui/icon';
 import { Video } from '@/types/video';
 import VideoCard from '@/components/VideoCard';
 import ProfileTab from '@/components/ProfileTab';
+import ChannelCard from '@/components/ChannelCard';
+import { channels } from '@/data/channels';
 
 interface VideoTabsProps {
   activeTab: string;
   searchQuery: string;
   history: string[];
   favorites: string[];
+  subscriptions: string[];
   trendingVideos: Video[];
   email: string;
   nickname: string;
@@ -17,6 +20,7 @@ interface VideoTabsProps {
   onTabChange: (value: string) => void;
   onVideoClick: (video: Video) => void;
   onToggleFavorite: (videoId: string) => void;
+  onToggleSubscription: (channelId: string) => void;
   onSaveProfile: (email: string, nickname: string, avatar: string | null) => void;
 }
 
@@ -25,6 +29,7 @@ export default function VideoTabs({
   searchQuery,
   history,
   favorites,
+  subscriptions,
   trendingVideos,
   email,
   nickname,
@@ -32,6 +37,7 @@ export default function VideoTabs({
   onTabChange,
   onVideoClick,
   onToggleFavorite,
+  onToggleSubscription,
   onSaveProfile,
 }: VideoTabsProps) {
   return (
@@ -58,8 +64,8 @@ export default function VideoTabs({
           <span className="hidden sm:inline">Избранное</span>
         </TabsTrigger>
         <TabsTrigger value="playlists" className="gap-2">
-          <Icon name="List" size={18} />
-          <span className="hidden sm:inline">Плейлисты</span>
+          <Icon name="Users" size={18} />
+          <span className="hidden sm:inline">Каналы</span>
         </TabsTrigger>
         <TabsTrigger value="profile" className="gap-2">
           <Icon name="User" size={18} />
@@ -198,13 +204,19 @@ export default function VideoTabs({
       </TabsContent>
 
       <TabsContent value="playlists" className="mt-0">
-        <div className="flex flex-col items-center justify-center py-20">
-          <Icon name="List" size={64} className="text-muted-foreground mb-4" />
-          <p className="text-muted-foreground mb-4">У вас пока нет плейлистов</p>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Icon name="Plus" size={18} className="mr-2" />
-            Создать плейлист
-          </Button>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-4">Каналы</h2>
+          <p className="text-muted-foreground">Откройте для себя интересные каналы</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {channels.map((channel) => (
+            <ChannelCard
+              key={channel.id}
+              channel={channel}
+              isSubscribed={subscriptions.includes(channel.id)}
+              onToggleSubscription={onToggleSubscription}
+            />
+          ))}
         </div>
       </TabsContent>
 
@@ -213,7 +225,9 @@ export default function VideoTabs({
           email={email}
           nickname={nickname}
           avatar={avatar}
+          subscriptions={subscriptions}
           onSave={onSaveProfile}
+          onToggleSubscription={onToggleSubscription}
         />
       </TabsContent>
     </Tabs>
