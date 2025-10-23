@@ -14,8 +14,15 @@ export default function Index() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [history, setHistory] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('home');
+  const [email, setEmail] = useState('user@example.com');
+  const [nickname, setNickname] = useState('VideoUser');
 
   const videoPlayer = useVideoPlayer();
+
+  const handleSaveProfile = (newEmail: string, newNickname: string) => {
+    setEmail(newEmail);
+    setNickname(newNickname);
+  };
 
   const toggleFavorite = (videoId: string) => {
     if (favorites.includes(videoId)) {
@@ -66,7 +73,12 @@ export default function Index() {
               <Icon name="Bell" size={20} />
             </Button>
             
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="shrink-0"
+              onClick={() => setActiveTab('profile')}
+            >
               <Icon name="User" size={20} />
             </Button>
           </div>
@@ -80,9 +92,12 @@ export default function Index() {
           history={history}
           favorites={favorites}
           trendingVideos={trendingVideos}
+          email={email}
+          nickname={nickname}
           onTabChange={setActiveTab}
           onVideoClick={handleVideoClick}
           onToggleFavorite={toggleFavorite}
+          onSaveProfile={handleSaveProfile}
         />
       </div>
 

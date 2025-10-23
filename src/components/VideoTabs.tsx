@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Video } from '@/types/video';
 import VideoCard from '@/components/VideoCard';
+import ProfileTab from '@/components/ProfileTab';
 
 interface VideoTabsProps {
   activeTab: string;
@@ -10,9 +11,12 @@ interface VideoTabsProps {
   history: string[];
   favorites: string[];
   trendingVideos: Video[];
+  email: string;
+  nickname: string;
   onTabChange: (value: string) => void;
   onVideoClick: (video: Video) => void;
   onToggleFavorite: (videoId: string) => void;
+  onSaveProfile: (email: string, nickname: string) => void;
 }
 
 export default function VideoTabs({
@@ -21,9 +25,12 @@ export default function VideoTabs({
   history,
   favorites,
   trendingVideos,
+  email,
+  nickname,
   onTabChange,
   onVideoClick,
   onToggleFavorite,
+  onSaveProfile,
 }: VideoTabsProps) {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
@@ -47,6 +54,10 @@ export default function VideoTabs({
         <TabsTrigger value="playlists" className="gap-2">
           <Icon name="List" size={18} />
           <span className="hidden sm:inline">Плейлисты</span>
+        </TabsTrigger>
+        <TabsTrigger value="profile" className="gap-2">
+          <Icon name="User" size={18} />
+          <span className="hidden sm:inline">Профиль</span>
         </TabsTrigger>
       </TabsList>
 
@@ -162,6 +173,14 @@ export default function VideoTabs({
             Создать плейлист
           </Button>
         </div>
+      </TabsContent>
+
+      <TabsContent value="profile" className="mt-0">
+        <ProfileTab 
+          email={email}
+          nickname={nickname}
+          onSave={onSaveProfile}
+        />
       </TabsContent>
     </Tabs>
   );
