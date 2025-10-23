@@ -55,21 +55,40 @@ export default function VideoPlayer({
   onSpeedChange,
 }: VideoPlayerProps) {
   const [isLandscape, setIsLandscape] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const handleOrientationChange = () => {
       setIsLandscape(window.matchMedia('(orientation: landscape)').matches);
     };
 
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
     handleOrientationChange();
     window.addEventListener('resize', handleOrientationChange);
     window.screen.orientation?.addEventListener('change', handleOrientationChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
 
     return () => {
       window.removeEventListener('resize', handleOrientationChange);
       window.screen.orientation?.removeEventListener('change', handleOrientationChange);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error('Fullscreen error:', error);
+    }
+  };
 
   return (
     <Dialog open={isPlaying} onOpenChange={onClose}>
@@ -171,8 +190,9 @@ export default function VideoPlayer({
                       variant="ghost"
                       size="icon"
                       className="text-white hover:bg-white/20"
+                      onClick={toggleFullscreen}
                     >
-                      <Icon name="Maximize" size={20} />
+                      <Icon name={isFullscreen ? "Minimize" : "Maximize"} size={20} />
                     </Button>
                   </div>
                 </div>
