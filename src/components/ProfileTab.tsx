@@ -161,7 +161,7 @@ export default function ProfileTab({ email, nickname, avatar, subscriptions, onS
 
         <div className="mt-8 pt-6 border-t border-border">
           <h4 className="font-semibold mb-4">Статистика</h4>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="bg-secondary/50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Icon name="Clock" size={18} className="text-primary" />
@@ -175,6 +175,13 @@ export default function ProfileTab({ email, nickname, avatar, subscriptions, onS
                 <span className="text-sm text-muted-foreground">Избранное</span>
               </div>
               <p className="text-2xl font-bold">0</p>
+            </div>
+            <div className="bg-secondary/50 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon name="Users" size={18} className="text-primary" />
+                <span className="text-sm text-muted-foreground">Подписки</span>
+              </div>
+              <p className="text-2xl font-bold">{subscriptions.length}</p>
             </div>
           </div>
         </div>
