@@ -189,6 +189,12 @@ export default function Index() {
         onToggleVideoSettings={videoPlayer.toggleVideoSettings}
         onQualityChange={videoPlayer.handleQualityChange}
         onSpeedChange={videoPlayer.handleSpeedChange}
+        relatedVideos={trendingVideos}
+        favorites={favorites}
+        onToggleFavorite={toggleFavorite}
+        onVideoSelect={videoPlayer.selectVideo}
+        subscriptions={subscriptions}
+        onToggleSubscription={toggleSubscription}
       />
 
       {showShortsViewer && (
