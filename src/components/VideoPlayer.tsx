@@ -1,12 +1,11 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import Icon from '@/components/ui/icon';
 import { Video } from '@/types/video';
 import VideoSettings from '@/components/VideoSettings';
 import { useState, useEffect } from 'react';
-import VideoPlayerOverlay from './video-player/VideoPlayerOverlay';
-import VideoPlayerControls from './video-player/VideoPlayerControls';
 import FullscreenVideoPlayer from './video-player/FullscreenVideoPlayer';
+import VideoDetailsPanel from './video-player/VideoDetailsPanel';
+import VideoPlayerOverlay from './video-player/VideoPlayerOverlay';
+import FullscreenControls from './video-player/FullscreenControls';
 
 interface VideoPlayerProps {
   isPlaying: boolean;
@@ -43,10 +42,8 @@ export default function VideoPlayer({
   isPlaying,
   selectedVideo,
   videoPlaying,
-  volume,
   currentTime,
   duration,
-  isMuted,
   showControls,
   seekIndicator,
   quality,
@@ -54,8 +51,6 @@ export default function VideoPlayer({
   showVideoSettings,
   onClose,
   onTogglePlayPause,
-  onToggleMute,
-  onVolumeChange,
   onProgressChange,
   onMouseMove,
   formatTime,
@@ -69,7 +64,6 @@ export default function VideoPlayer({
   subscriptions = [],
   onToggleSubscription = () => {},
 }: VideoPlayerProps) {
-  const [isLandscape, setIsLandscape] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
@@ -88,22 +82,13 @@ export default function VideoPlayer({
   }, [selectedVideo]);
 
   useEffect(() => {
-    const handleOrientationChange = () => {
-      setIsLandscape(window.matchMedia('(orientation: landscape)').matches);
-    };
-
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
-    handleOrientationChange();
-    window.addEventListener('resize', handleOrientationChange);
-    window.screen.orientation?.addEventListener('change', handleOrientationChange);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
 
     return () => {
-      window.removeEventListener('resize', handleOrientationChange);
-      window.screen.orientation?.removeEventListener('change', handleOrientationChange);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
@@ -193,62 +178,58 @@ export default function VideoPlayer({
 
   return (
     <Dialog open={isPlaying} onOpenChange={onClose}>
-      <DialogContent className={`w-full p-0 bg-black border-none transition-all ${
-        isLandscape ? 'max-w-full h-screen' : 'max-w-6xl'
-      }`}>
-        <div className="relative w-full h-full" onMouseMove={onMouseMove}>
-          <div className={`bg-black flex items-center justify-center relative group ${
-            isLandscape ? 'h-screen' : 'aspect-video'
-          }`}>
-            <VideoPlayerOverlay
-              selectedVideo={selectedVideo}
-              videoPlaying={videoPlaying}
-              seekIndicator={seekIndicator}
-              onTogglePlayPause={onTogglePlayPause}
-            />
+      <DialogContent className="w-full h-screen max-w-full p-0 bg-black border-none">
+        <div className="h-full overflow-y-auto">
+          <div className="relative bg-black" onMouseMove={onMouseMove}>
+            <div className="aspect-video bg-black flex items-center justify-center relative group">
+              <VideoPlayerOverlay
+                selectedVideo={selectedVideo}
+                videoPlaying={videoPlaying}
+                seekIndicator={seekIndicator}
+                onTogglePlayPause={onTogglePlayPause}
+              />
 
-            <VideoPlayerControls
-              showControls={showControls}
-              videoPlaying={videoPlaying}
-              currentTime={currentTime}
-              duration={duration}
-              volume={volume}
-              isMuted={isMuted}
-              quality={quality}
-              playbackSpeed={playbackSpeed}
-              isFullscreen={isFullscreen}
-              onTogglePlayPause={onTogglePlayPause}
-              onToggleMute={onToggleMute}
-              onProgressChange={onProgressChange}
-              onVolumeChange={onVolumeChange}
-              onToggleVideoSettings={onToggleVideoSettings}
-              toggleFullscreen={toggleFullscreen}
-              formatTime={formatTime}
-            />
-          </div>
-          
-          <div className="absolute top-4 right-4">
-            <Button 
-              variant="ghost"
-              size="icon" 
-              className="text-white hover:bg-white/20 rounded-full"
-              onClick={onClose}
-            >
-              <Icon name="X" size={24} />
-            </Button>
-          </div>
-
-          {showVideoSettings && (
-            <div className="absolute top-20 right-4 z-50">
-              <VideoSettings
-                quality={quality}
-                playbackSpeed={playbackSpeed}
-                onQualityChange={onQualityChange}
-                onSpeedChange={onSpeedChange}
-                onClose={onToggleVideoSettings}
+              <FullscreenControls
+                showControls={showControls}
+                videoPlaying={videoPlaying}
+                currentTime={currentTime}
+                duration={duration}
+                onTogglePlayPause={onTogglePlayPause}
+                onProgressChange={onProgressChange}
+                toggleFullscreen={toggleFullscreen}
+                onToggleVideoSettings={onToggleVideoSettings}
+                formatTime={formatTime}
               />
             </div>
-          )}
+
+            {showVideoSettings && (
+              <div className="absolute top-16 right-4 z-50">
+                <VideoSettings
+                  quality={quality}
+                  playbackSpeed={playbackSpeed}
+                  onQualityChange={onQualityChange}
+                  onSpeedChange={onSpeedChange}
+                  onClose={onToggleVideoSettings}
+                />
+              </div>
+            )}
+          </div>
+
+          <VideoDetailsPanel
+            selectedVideo={selectedVideo}
+            likes={likes}
+            dislikes={dislikes}
+            userLike={userLike}
+            isSubscribed={isSubscribed}
+            relatedVideos={relatedVideos}
+            favorites={favorites}
+            onToggleFavorite={onToggleFavorite}
+            onVideoSelect={onVideoSelect}
+            onToggleSubscription={onToggleSubscription}
+            handleLike={handleLike}
+            handleDislike={handleDislike}
+            formatCount={formatCount}
+          />
         </div>
       </DialogContent>
     </Dialog>
